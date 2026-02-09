@@ -258,40 +258,80 @@ Practical tips
 - Timezones and trading calendars: Code assumes a single trading calendar; multi-market or cross-listing requires calendar-aware alignment.
 - Framework agnostic: The modeling code may assume Keras or PyTorch in different files — confirm the chosen framework in the codebase before running training (TODO).
 
-## Installation & Reproducible Environment
+## Installation & Reproducible Environment (Docker)
 
-These instructions create a reproducible Python environment on Windows (PowerShell). Adjust for Linux/macOS as needed.
+These instructions create a fully reproducible Python environment using Docker. No local Python installation or virtual environment is required.
 
-1. Clone repository and change into it
+---
+
+### 1. Clone repository
 
 ```powershell
 git clone https://github.com/AdamAdham/Stock-Return-Prediction.git
 cd Stock-Return-Prediction
 ```
 
-2. Create and activate virtual environment (recommended)
+---
+
+### 2. Build Docker image
+
+This will create a container image with TensorFlow GPU (or CPU) and all dependencies.
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+docker build -t stock-predictor .
 ```
 
-3. Install core dependencies
+- `stock-predictor` is the name of the Docker image
+    
+- Make sure your `Dockerfile` and `requirements.txt` are in the repo root
+    
 
-TODO: Add `requirements.txt` with exact pinned versions. The list below is a minimal starting point:
+---
+
+### 3. Run a specific Python file inside the container
+
+You can run any script in the container without entering it:
 
 ```powershell
-pip install --upgrade pip
-pip install pandas numpy scipy scikit-learn matplotlib seaborn jupyter
-# If using TensorFlow (CPU)
-pip install tensorflow
-# Or PyTorch (CPU) - choose one
-pip install torch torchvision torchaudio
+docker run --rm -it -v ${PWD}:/workspace stock-predictor python train.py
 ```
 
-4. (Optional) For GPU training
+- `--rm` → automatically removes the container after it exits
+    
+- `-it` → interactive terminal
+    
+- `-v ${PWD}:/workspace` → mounts your local project folder into the container
+    
+- `python train.py` → runs your specific Python file
+    
 
-- Follow TensorFlow / PyTorch official docs to install GPU-enabled builds and CUDA/cuDNN matching your GPU and drivers.
+You can replace `train.py` with any other file in your repo.
+
+---
+
+### 4. Enter the container interactively
+
+To explore the container, run:
+
+```powershell
+docker run --rm -it -v ${PWD}:/workspace stock-predictor bash
+```
+
+Then, inside the container:
+
+```bash
+# List files
+ls
+
+# Run any Python script
+python train.py
+python src/evaluate.py
+
+# Start Jupyter
+jupyter lab --ip=0.0.0.0 --no-browser --allow-root
+```
+
+- All changes to files in `/workspace` will reflect in your local project directory.
 
 ## Contributing
 
