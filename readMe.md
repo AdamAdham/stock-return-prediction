@@ -326,9 +326,6 @@ ls
 # Run any Python script
 python train.py
 python src/evaluate.py
-
-# Start Jupyter
-jupyter lab --ip=0.0.0.0 --no-browser --allow-root
 ```
 
 - All changes to files in `/workspace` will reflect in your local project directory.
